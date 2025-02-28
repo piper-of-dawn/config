@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# GitHub SSH Key Generator
+# This script will create an SSH key and help you set it up with GitHub
+
+# Text formatting
+BOLD="\e[1m"
+GREEN="\e[32m"
+BLUE="\e[34m"
+RESET="\e[0m"
+
+echo -e "${BOLD}${BLUE}=== GitHub SSH Key Generator ===${RESET}\n"
+
+# Default location for SSH keys
+SSH_DIR="$HOME/.ssh"
+KEY_FILE="$SSH_DIR/github_key"
+PUB_KEY_FILE="$KEY_FILE.pub"
+
+# Create .ssh directory if it doesn't exist
+if [ ! -d "$SSH_DIR" ]; then
+    echo -e "${GREEN}Creating SSH directory...${RESET}"
+    mkdir -p "$SSH_DIR"
+    chmod 700 "$SSH_DIR"
+fi
+
+# Check if key already exists
+if [ -f "$KEY_FILE" ]; then
+    echo -e "${BOLD}An SSH key already exists at $KEY_FILE${RESET}"
+    read -p "Do you want to create a new key anyway? (y/n): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "${GREEN}Using existing key.${RESET}"
+    else
+        rm -f "$KEY_FILE" "$PUB_KEY_FILE"
+    fi
+fi
+
+# Generate the key if it doesn't exist
+if [ ! -f "$KEY_FILE" ]; then
+    echo -e "${GREEN}Generating new SSH key...${RESET}"
+    
+    # Get email for comment
+    read -p "Enter your GitHub email address: " github_email
+    
+    # Generate SSH key with provided email
+    ssh-keygen -t ed25519 -C "$github_email" -f "$KEY_FILE"
+    
+    echo -e "\n${GREEN}SSH key generated successfully!${RESET}"
+fi
+
+# Set correct permissions
+chmod 600 "$KEY_FILE"
+chmod 644 "$PUB_KEY_FILE"
+
+# Start ssh-agent and add the key
+echo -e "\n${GREEN}Starting ssh-agent and adding key...${RESET}"
+eval "$(ssh-agent -s)"
+ssh-add "$KEY_FILE"
+
+# Add configuration to SSH config file
+CONFIG_FILE="$SSH_DIR/config"
+if [ ! -f "$CONFIG_FILE" ] || ! grep -q "Host github.com" "$CONFIG_FILE"; then
+    echo -e "\n${GREEN}Updating SSH config file...${RESET}"
+    cat >> "$CONFIG_FILE" << EOF
+# GitHub configuration
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile $KEY_FILE
+    IdentitiesOnly yes
+EOF
+    chmod 600 "$CONFIG_FILE"
+fi
+
+# Display the public key
+echo -e "\n${BOLD}${BLUE}=== Your Public SSH Key ===${RESET}\n"
+cat "$PUB_KEY_FILE"
+
+# Instructions for adding to GitHub
+echo -e "\n${BOLD}${BLUE}=== Next Steps ===${RESET}\n"
+echo -e "1. Copy the public key above (everything including ssh-ed25519 and your email)"
+echo -e "2. Go to GitHub → Settings → SSH and GPG keys → New SSH key"
+echo -e "3. Give your key a title (e.g., 'My Computer')"
+echo -e "4. Paste the key into the 'Key' field"
+echo -e "5. Click 'Add SSH key'"
+echo -e "\n${GREEN}To test your SSH connection to GitHub, run:${RESET}"
+echo -e "   ssh -T git@github.com\n"
+echo -e "${GREEN}You should see a message like:${RESET}"
+echo -e "   Hi username! You've successfully authenticated, but GitHub does not provide shell access.\n"

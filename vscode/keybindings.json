@@ -1,0 +1,69 @@
+[
+    {
+        "key": "ctrl+right",
+        "command": "workbench.action.terminal.resizePaneRight",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+left",
+        "command": "workbench.action.terminal.resizePaneLeft",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+up",
+        "command": "workbench.action.terminal.resizePaneUp",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+down",
+        "command": "workbench.action.terminal.resizePaneDown",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+space",
+        "command": "workbench.action.quickOpen"
+    },
+    {
+        "key": "alt+q",
+        "command": "workbench.action.toggleCenteredLayout"
+    },
+    {
+        "key": "alt+z",
+        "command": "editor.action.toggleWordWrap"
+    },
+    {
+        "key": "ctrl+k ctrl+t",
+        "command": "workbench.action.selectTheme"
+    },
+    {
+        "key": "ctrl+k ctrl+s",
+        "command": "workbench.action.openGlobalKeybindings"
+    },
+    {
+        "key": "ctrl+shift+e",
+        "command": "workbench.view.explorer"
+    },
+    {
+        "key": "ctrl+shift+f",
+        "command": "workbench.action.findInFiles"
+    },
+    {
+        "key": "ctrl+shift+g",
+        "command": "workbench.view.scm"
+    },
+    {
+        "key": "ctrl+k ctrl+left",
+        "command": "workbench.action.positionPanelLeft",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+k ctrl+right",
+        "command": "workbench.action.positionPanelRight",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+k ctrl+down",
+        "command": "workbench.action.positionPanelDown",
+        "when": "terminalFocus"
+    },
+]

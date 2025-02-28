@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# Bash setup script for Windows (add to .bashrc)
+
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" > /dev/null 2>&1
+}
+
+echo "Setting up enhanced bash environment..."
+
+# Install and configure zoxide
+if ! command_exists zoxide; then
+    echo "Installing zoxide..."
+    if command_exists curl; then
+        curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+    else
+        echo "Error: curl is required to install zoxide. Please install curl first."
+        echo "You can install curl using: apt-get install curl"
+    fi
+fi
+
+# Set up zoxide in bash
+if command_exists zoxide; then
+    echo "Configuring zoxide..."
+    # Add zoxide to .bashrc
+    echo '# zoxide initialization' >> ~/.bashrc
+    echo 'eval "$(zoxide init bash)"' >> ~/.bashrc
+    echo 'alias cd="z"' >> ~/.bashrc
+    echo "Zoxide configured successfully!"
+fi
+
+# Enable tab completion
+echo "Enabling tab completion..."
+echo '# Enable tab completion' >> ~/.bashrc
+echo 'if ! shopt -oq posix; then' >> ~/.bashrc
+echo '  if [ -f /usr/share/bash-completion/bash_completion ]; then' >> ~/.bashrc
+echo '    . /usr/share/bash-completion/bash_completion' >> ~/.bashrc
+echo '  elif [ -f /etc/bash_completion ]; then' >> ~/.bashrc
+echo '    . /etc/bash_completion' >> ~/.bashrc
+echo '  fi' >> ~/.bashrc
+echo 'fi' >> ~/.bashrc
+
+# Install and configure bash-completion package if needed
+echo "Checking for bash-completion..."
+if ! command_exists pkg-config; then
+    echo "Installing bash-completion..."
+    apt-get update && apt-get install -y bash-completion
+fi
+
+# Install and configure autocomplete suggestions (using fzf)
+if ! command_exists fzf; then
+    echo "Installing fzf for enhanced autocomplete suggestions..."
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    ~/.fzf/install --all
+else
+    echo "fzf already installed."
+fi
+
+# Add history search with up/down arrows
+echo "Configuring history search with arrow keys..."
+echo '# Better history navigation' >> ~/.bashrc
+echo 'bind '\"\\e[A\": history-search-backward'' >> ~/.bashrc
+echo 'bind '\"\\e[B\": history-search-forward'' >> ~/.bashrc
+
+# Enable autosuggestions with custom settings
+echo "Configuring autosuggestions..."
+echo '# Enhanced command line behavior' >> ~/.bashrc
+echo 'shopt -s autocd' >> ~/.bashrc       # Change to named directory
+echo 'shopt -s cdspell' >> ~/.bashrc      # Autocorrect typos in path names when using cd
+echo 'shopt -s cmdhist' >> ~/.bashrc      # Save multi-line commands as one command
+echo 'shopt -s histappend' >> ~/.bashrc   # Append to the history file, don't overwrite it
+echo 'shopt -s expand_aliases' >> ~/.bashrc # Expand aliases
+
+# Set larger history size
+echo '# Increase history size' >> ~/.bashrc
+echo 'export HISTSIZE=10000' >> ~/.bashrc
+echo 'export HISTFILESIZE=10000' >> ~/.bashrc
+echo 'export HISTCONTROL=ignoreboth' >> ~/.bashrc  # Ignore duplicates and commands starting with space
+
+# Add a nicer command prompt with git branch info
+echo "Configuring improved prompt..."
+echo '# Better prompt with git information' >> ~/.bashrc
+echo 'parse_git_branch() {' >> ~/.bashrc
+echo '  git branch 2> /dev/null | sed -e "/^[^*]/d" -e "s/* \(.*\)/ (\1)/"' >> ~/.bashrc
+echo '}' >> ~/.bashrc
+echo 'export PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]\$(parse_git_branch)\[\033[00m\]\$ "' >> ~/.bashrc
+
+echo "Setup complete! Restart your bash terminal or run 'source ~/.bashrc' to apply changes."

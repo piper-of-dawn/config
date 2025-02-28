@@ -1,0 +1,1 @@
+pip install polars pandas numpy scipy matplotlib seaborn yfinance scikit-learn jupyter ipykernel
