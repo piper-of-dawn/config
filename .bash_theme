@@ -1,0 +1,76 @@
+# Minimal Zen Bash Theme
+# Add this to your .bashrc or create a separate file and source it
+
+# Reset any previous color settings
+reset_color="\[\033[0m\]"
+
+# Subtle colors
+subtle_gray="\[\033[38;5;245m\]"
+soft_blue="\[\033[38;5;67m\]"
+soft_green="\[\033[38;5;107m\]"
+
+# Function to get git branch with minimal output (just the branch name)
+zen_git_branch() {
+  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
+}
+
+# Function to check git status - returns * if there are changes, nothing if clean
+zen_git_status() {
+  if ! git diff --quiet 2> /dev/null; then
+    echo "*"
+  fi
+}
+
+# The minimal zen prompt function
+zen_prompt() {
+  # Get the exit status of the last command
+  local exit_status=$?
+  
+  # Start with a blank line for breathing room
+  PS1="\n"
+  
+  # Add current directory (basename only, not full path)
+  PS1+="${soft_blue}\W${reset_color} "
+  
+  # Add git info if in a git repository
+  if git rev-parse --is-inside-work-tree &> /dev/null; then
+    local branch=$(zen_git_branch)
+    local status=$(zen_git_status)
+    PS1+="${subtle_gray}${branch}${status}${reset_color} "
+  fi
+  
+  # Simple prompt character - green if last command succeeded, subtle gray if failed
+  if [ $exit_status -eq 0 ]; then
+    PS1+="${soft_green}›${reset_color} "
+  else
+    PS1+="${subtle_gray}›${reset_color} "
+  fi
+}
+
+# Set the prompt command to our zen function
+PROMPT_COMMAND=zen_prompt
+
+# Optional: Clean up the terminal title
+case "$TERM" in
+xterm*|rxvt*)
+    PROMPT_COMMAND+=' && echo -ne "\033]0;${PWD##*/}\007"'
+    ;;
+*)
+    ;;
+esac
+
+# Optional: Simplify the command history display with timestamps
+export HISTTIMEFORMAT="%F %T "
+
+# Optional: Reduce noise in the terminal
+export LESS="-F -X -R"
+export EDITOR="vim"
+
+# Optional: Simpler ls colors (less vibrant)
+export LS_COLORS="di=38;5;67:ln=38;5;107:ex=38;5;245"
+alias ls="ls --color=auto"
+alias l="ls -la"
+
+# Optional: Simplified clear and reset
+alias c="clear"
+alias r="reset"
