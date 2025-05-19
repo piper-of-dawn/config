@@ -20,7 +20,7 @@
         "when": "terminalFocus"
     },
     {
-        "key": "ctrl+space",
+        "key": "ctrl+alt+space",
         "command": "workbench.action.quickOpen"
     },
     {
@@ -65,5 +65,9 @@
         "key": "ctrl+k ctrl+down",
         "command": "workbench.action.positionPanelDown",
         "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+enter",
+        "command": "workbench.action.terminal.runSelectedText"
     },
 ]
