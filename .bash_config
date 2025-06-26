@@ -5,3 +5,9 @@ alias l="ls -la"
 alias c="clear"
 alias r="reset"
 eval "$(zoxide init --cmd cd zsh)"
+export PS1='\[\e[1;34m\]\w\[\e[0m\] \$ '
+
+if [ -f /etc/bash_completion ]; then
+  . /etc/bash_completion
+fi
+
